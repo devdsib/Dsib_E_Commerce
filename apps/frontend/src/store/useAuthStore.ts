@@ -37,15 +37,13 @@ export const useAuthStore = create<AuthStore>()(
         );
         const { user, token } = response.data;
         set({ user, token, isLoggedIn: true });
-        // Also set as default auth header for future requests
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        // Token is now auto-attached via apiClient interceptor — no need to set axios.defaults
       },
 
       logout: async () => {
         try {
           await axios.post(`${API}/auth/logout`, {}, { withCredentials: true });
         } catch { /* ignore */ }
-        delete axios.defaults.headers.common["Authorization"];
         set({ user: null, token: null, isLoggedIn: false });
       },
     }),

@@ -9,13 +9,19 @@ const PRISMA_ERRORS: Record<string, { status: number; message: string }> = {
   P2003: { status: 400, message: "Related record not found (foreign key constraint failed)." },
 };
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export const errorHandler = (
   err: any,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  // Always log the full error server-side for debugging
   console.error(`[Error] ${err.code || ""} ${err.message}`);
+  if (!isProduction) {
+    console.error(err.stack);
+  }
 
   // Handle Prisma client errors
   if (err.code && err.code.startsWith("P")) {
@@ -23,15 +29,24 @@ export const errorHandler = (
     if (prismaError) {
       return res.status(prismaError.status).json({ error: prismaError.message });
     }
-    // Unknown Prisma error — still expose the code
+    // Unknown Prisma error — sanitize in production
+    if (isProduction) {
+      return res.status(500).json({ error: "A database error occurred. Please try again later." });
+    }
     return res.status(500).json({ error: `Database error [${err.code}]: ${err.message}` });
   }
 
   const status = err.status || err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
+
+  // In production, never expose raw error messages for 500-level errors
+  const message =
+    isProduction && status >= 500
+      ? "An unexpected error occurred. Please try again later."
+      : err.message || "Internal Server Error";
 
   res.status(status).json({
     error: message,
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+    // Only include stack traces in development
+    ...(!isProduction && { stack: err.stack }),
   });
 };

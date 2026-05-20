@@ -13,6 +13,21 @@ import { errorHandler } from "./middleware/errorHandler";
 
 dotenv.config();
 
+// ── Startup Environment Validation ──
+const REQUIRED_SECRETS = ["JWT_SECRET", "RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "RAZORPAY_WEBHOOK_SECRET"];
+const missingSecrets = REQUIRED_SECRETS.filter((key) => !process.env[key]);
+
+if (missingSecrets.length > 0) {
+  const message = `⚠️  Missing required environment variables: ${missingSecrets.join(", ")}`;
+  if (process.env.NODE_ENV === "production") {
+    console.error(`🚨 FATAL: ${message}`);
+    console.error("Server cannot start in production without these secrets. Aborting.");
+    process.exit(1);
+  } else {
+    console.warn(`${message}\n   → Running in development mode with defaults. Set these in your .env file.`);
+  }
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 

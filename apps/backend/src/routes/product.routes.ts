@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getProducts, getProductBySlug, createProduct, updateProduct, deleteProduct } from "../controllers/product.controller";
+import { authenticate, authorize } from "../middleware/auth";
 
 const router = Router();
 
@@ -7,9 +8,9 @@ const router = Router();
 router.get("/", getProducts);
 router.get("/:slug", getProductBySlug);
 
-// Admin Routes (To be protected by auth middleware)
-router.post("/", createProduct);
-router.patch("/:id", updateProduct);
-router.delete("/:id", deleteProduct);
+// Admin Routes — Protected by JWT + ADMIN role
+router.post("/", authenticate, authorize(["ADMIN"]), createProduct);
+router.patch("/:id", authenticate, authorize(["ADMIN"]), updateProduct);
+router.delete("/:id", authenticate, authorize(["ADMIN"]), deleteProduct);
 
 export { router as productRouter };

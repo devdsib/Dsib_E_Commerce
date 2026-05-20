@@ -197,10 +197,18 @@ export default function AdminProductsPage() {
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-muted-foreground uppercase">Base Price (₹)</label>
                   <Input type="number" value={formData.price} onChange={(e) => setFormData({...formData, price: Number(e.target.value)})} required />
+                  <p className="text-[10px] text-muted-foreground">
+                    + 18% GST (₹{(formData.price * 0.18).toFixed(2)}) = <span className="font-medium text-foreground">₹{(formData.price * 1.18).toFixed(2)}</span>
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-muted-foreground uppercase">Discount Price (₹)</label>
                   <Input type="number" value={formData.discountPrice} onChange={(e) => setFormData({...formData, discountPrice: Number(e.target.value)})} />
+                  {formData.discountPrice > 0 && (
+                    <p className="text-[10px] text-muted-foreground">
+                      + 18% GST (₹{(formData.discountPrice * 0.18).toFixed(2)}) = <span className="font-medium text-foreground">₹{(formData.discountPrice * 1.18).toFixed(2)}</span>
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-muted-foreground uppercase">Stock Qty</label>
