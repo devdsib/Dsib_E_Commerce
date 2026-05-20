@@ -44,6 +44,7 @@ export default function AdminProductsPage() {
     price: 0,
     discountPrice: 0,
     stockQuantity: 0,
+    gstPercentage: 18,
     categoryId: "",
     description: "",
     brand: "",
@@ -84,6 +85,7 @@ export default function AdminProductsPage() {
       price: 0,
       discountPrice: 0,
       stockQuantity: 0,
+      gstPercentage: 18,
       categoryId: "",
       description: "",
       brand: "",
@@ -101,6 +103,7 @@ export default function AdminProductsPage() {
       price: product.price,
       discountPrice: product.discountPrice || 0,
       stockQuantity: product.stockQuantity,
+      gstPercentage: product.gstPercentage || 18,
       categoryId: product.categoryId,
       description: product.description,
       brand: product.brand || "",
@@ -122,6 +125,7 @@ export default function AdminProductsPage() {
         price: Number(formData.price),
         discountPrice: formData.discountPrice ? Number(formData.discountPrice) : null,
         stockQuantity: Number(formData.stockQuantity),
+        gstPercentage: Number(formData.gstPercentage),
         brand: formData.brand || undefined,
         images: imageUrl ? [imageUrl] : [],
       };
@@ -193,12 +197,12 @@ export default function AdminProductsPage() {
                   <Input value={formData.sku} onChange={(e) => setFormData({...formData, sku: e.target.value})} placeholder="e.g. ARD-UNO-001" required />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-muted-foreground uppercase">Base Price (₹)</label>
                   <Input type="number" value={formData.price} onChange={(e) => setFormData({...formData, price: Number(e.target.value)})} required />
                   <p className="text-[10px] text-muted-foreground">
-                    + 18% GST (₹{(formData.price * 0.18).toFixed(2)}) = <span className="font-medium text-foreground">₹{(formData.price * 1.18).toFixed(2)}</span>
+                    + {formData.gstPercentage}% GST (₹{(formData.price * (formData.gstPercentage / 100)).toFixed(2)}) = <span className="font-medium text-foreground">₹{(formData.price * (1 + formData.gstPercentage / 100)).toFixed(2)}</span>
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -206,9 +210,23 @@ export default function AdminProductsPage() {
                   <Input type="number" value={formData.discountPrice} onChange={(e) => setFormData({...formData, discountPrice: Number(e.target.value)})} />
                   {formData.discountPrice > 0 && (
                     <p className="text-[10px] text-muted-foreground">
-                      + 18% GST (₹{(formData.discountPrice * 0.18).toFixed(2)}) = <span className="font-medium text-foreground">₹{(formData.discountPrice * 1.18).toFixed(2)}</span>
+                      + {formData.gstPercentage}% GST (₹{(formData.discountPrice * (formData.gstPercentage / 100)).toFixed(2)}) = <span className="font-medium text-foreground">₹{(formData.discountPrice * (1 + formData.gstPercentage / 100)).toFixed(2)}</span>
                     </p>
                   )}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase">GST %</label>
+                  <select 
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    value={formData.gstPercentage}
+                    onChange={(e) => setFormData({...formData, gstPercentage: Number(e.target.value)})}
+                  >
+                    <option value={0}>0% (Exempt)</option>
+                    <option value={5}>5%</option>
+                    <option value={12}>12%</option>
+                    <option value={18}>18%</option>
+                    <option value={28}>28%</option>
+                  </select>
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-muted-foreground uppercase">Stock Qty</label>
