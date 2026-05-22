@@ -21,6 +21,8 @@ interface ProductCardProps {
     stock?: number;
     stockQuantity?: number;
     brand?: string | null;
+    brand?: string | null;
+    gstPercentage?: number;
     _count?: {
       reviews: number;
     };
@@ -53,6 +55,7 @@ export function ProductCard({ product }: ProductCardProps) {
         imageUrl: imageUrl,
         brand: brand,
         stock: stock,
+        gstPercentage: product.gstPercentage || 18,
       });
       openCart();
     }
@@ -114,11 +117,17 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="mt-auto pt-2 flex items-end gap-2">
           {discountPrice ? (
             <>
-              <span className="text-lg font-bold" style={{ color: "hsl(var(--accent))" }}>₹{discountPrice.toLocaleString()}</span>
-              <span className="text-xs text-muted-foreground line-through mb-0.5">₹{product.price.toLocaleString()}</span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-lg font-bold" style={{ color: "hsl(var(--accent))" }}>₹{Math.round(discountPrice * (1 + (product.gstPercentage || 18) / 100)).toLocaleString()}</span>
+                <span className="text-[10px] text-muted-foreground">(Incl. GST)</span>
+              </div>
+              <span className="text-xs text-muted-foreground line-through mb-0.5 ml-1">₹{Math.round(product.price * (1 + (product.gstPercentage || 18) / 100)).toLocaleString()}</span>
             </>
           ) : (
-            <span className="text-lg font-bold" style={{ color: "hsl(var(--accent))" }}>₹{product.price.toLocaleString()}</span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-lg font-bold" style={{ color: "hsl(var(--accent))" }}>₹{Math.round(product.price * (1 + (product.gstPercentage || 18) / 100)).toLocaleString()}</span>
+              <span className="text-[10px] text-muted-foreground">(Incl. GST)</span>
+            </div>
           )}
         </div>
 

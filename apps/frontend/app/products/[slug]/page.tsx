@@ -98,7 +98,8 @@ export default function ProductDetailPage() {
         discountPrice: product.discountPrice || undefined, 
         imageUrl: imageUrl, 
         brand: product.brand || "", 
-        stock: stock 
+        stock: stock,
+        gstPercentage: product.gstPercentage || 18
       });
       if (qty > 1) updateQuantity(product.id, Math.min(qty, stock));
     }
@@ -177,12 +178,18 @@ export default function ProductDetailPage() {
           <div className="flex items-end gap-3 mb-4">
             {product.discountPrice ? (
               <>
-                <span className="text-3xl font-bold" style={{ color: "hsl(var(--accent))" }}>₹{product.discountPrice.toLocaleString()}</span>
-                <span className="text-lg text-muted-foreground line-through mb-0.5">₹{product.price.toLocaleString()}</span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold" style={{ color: "hsl(var(--accent))" }}>₹{Math.round(product.discountPrice * (1 + (product.gstPercentage || 18) / 100)).toLocaleString()}</span>
+                  <span className="text-sm font-medium text-muted-foreground">(Incl. GST)</span>
+                </div>
+                <span className="text-lg text-muted-foreground line-through mb-0.5">₹{Math.round(product.price * (1 + (product.gstPercentage || 18) / 100)).toLocaleString()}</span>
                 <span className="text-sm font-semibold px-2 py-0.5 rounded-sm mb-0.5" style={{ backgroundColor: "hsl(var(--destructive) / 0.1)", color: "hsl(var(--destructive))" }}>{discountPercent}% OFF</span>
               </>
             ) : (
-              <span className="text-3xl font-bold" style={{ color: "hsl(var(--accent))" }}>₹{product.price.toLocaleString()}</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold" style={{ color: "hsl(var(--accent))" }}>₹{Math.round(product.price * (1 + (product.gstPercentage || 18) / 100)).toLocaleString()}</span>
+                <span className="text-sm font-medium text-muted-foreground">(Incl. GST)</span>
+              </div>
             )}
           </div>
 
