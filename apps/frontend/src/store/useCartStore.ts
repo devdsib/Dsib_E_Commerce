@@ -11,6 +11,7 @@ export interface CartItem {
   brand: string;
   quantity: number;
   stock: number;
+  gstPercentage: number;
 }
 
 interface CartState {
@@ -28,9 +29,9 @@ interface CartState {
 
   // Computed
   totalItems: () => number;
-  subtotal: () => number;
+  subtotal: () => number; // exclusive
   gstAmount: () => number;
-  total: () => number;
+  total: () => number; // inclusive
 }
 
 export const useCartStore = create<CartState>()(
@@ -50,7 +51,7 @@ export const useCartStore = create<CartState>()(
             ),
           });
         } else {
-          set({ items: [...get().items, { ...item, quantity: 1 }] });
+          set({ items: [...get().items, { ...item, quantity: 1, gstPercentage: item.gstPercentage || 18 }] });
         }
         set({ isCartOpen: true });
       },
@@ -85,7 +86,11 @@ export const useCartStore = create<CartState>()(
           0
         ),
 
-      gstAmount: () => get().subtotal() * 0.18,
+      gstAmount: () =>
+        get().items.reduce(
+          (sum, i) => sum + (i.discountPrice ?? i.price) * i.quantity * ((i.gstPercentage || 18) / 100),
+          0
+        ),
 
       total: () => get().subtotal() + get().gstAmount(),
     }),

@@ -21,7 +21,6 @@ interface ProductCardProps {
     stock?: number;
     stockQuantity?: number;
     brand?: string | null;
-    brand?: string | null;
     gstPercentage?: number;
     _count?: {
       reviews: number;
